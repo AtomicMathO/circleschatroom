@@ -1,8 +1,8 @@
 const moment = require("moment-timezone");
 
-function formatMessage(username, text) {
+function formatMessage(surname, text) {
   return {
-    username,
+    surname,
     text,
     time: moment().tz("Europe/Paris").format("HH:mm - DD/MM/YY"),
   };

@@ -64,7 +64,7 @@ const getUserCircles = function (userId) {
 
     for (const circle of circles) {
       const option = document.createElement("option");
-      option.value = circle.unique_code;
+      option.value = `${circle.unique_code}, ${circle.name}`;
       option.textContent = circle.name;
       roomsChoice.append(option);
     }

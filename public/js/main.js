@@ -3,7 +3,7 @@ const chatMessages = document.querySelector(".chat-messages");
 const roomName = document.getElementById("room-name");
 const userList = document.getElementById("users");
 
-const { surname, room, roomTitle } = Qs.parse(location.search, {
+const { surname, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
 });
 
@@ -12,12 +12,11 @@ const socket = io();
 socket.emit("joinRoom", { surname, room });
 
 socket.on("roomUsers", ({ room, users }) => {
-  ouputRoomName(room);
+  outputRoomName(room);
   outputUsers(users);
 });
 
 socket.on("message", (message) => {
-  console.log(message);
   outputMessage(message);
 
   chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -48,7 +47,7 @@ function outputMessage(message) {
   div.classList.add("message");
   const p = document.createElement("p");
   p.classList.add("meta");
-  p.innerText = message.username;
+  p.innerText = message.surname;
   p.innerHTML += `<span> ${message.time}</span>`;
   div.appendChild(p);
   const para = document.createElement("p");
@@ -59,14 +58,14 @@ function outputMessage(message) {
 }
 
 function outputRoomName(room) {
-  roomName.innerText = room;
+  roomName.innerText = room.split(/ (.*)/)[1].trim();
 }
 
 function outputUsers(users) {
   userList.innerHTML = "";
   users.forEach((user) => {
     const li = document.createElement("li");
-    li.innerText = user.username;
+    li.innerText = user.surname;
     userList.appendChild(li);
   });
 }

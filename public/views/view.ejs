@@ -11,7 +11,7 @@
       integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../css/style.css" />
     <title>ChatCord App</title>
   </head>
   <body>
@@ -41,12 +41,12 @@
           </div>
           <button type="submit" class="btn">Login</button>
         </form>
-        <form action="chat.html" id="join-form">
+        <form action="./chat" id="join-form" method="get">
           <div class="form-control">
             <label for="room">Room</label>
             <select name="room" id="room"></select>
           </div>
-          <button type="submit" class="btn">Join Chat</button>
+          <button type="submit" class="btn">Join Chat</button> 
         </form>
       </main>
     </div>

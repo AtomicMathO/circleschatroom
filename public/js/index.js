@@ -35,15 +35,20 @@ const logUser = function (email, password) {
       user.surname = response.data.surname;
       user.token = response.data.token;
       getUserCircles(user.id);
-
       formMain.removeChild(loginForm);
-      const userInput = document.createElement("input");
-      userInput.type = "text";
-      userInput.name = "surname";
-      userInput.id = "user_id";
-      userInput.value = user.surname;
-      userInput.textContent = user.surname;
-      joinForm.prepend(userInput);
+      const userIdInput = document.createElement("input");
+      userIdInput.type = "hidden";
+      userIdInput.name = "user_id";
+      userIdInput.id = "user_id";
+      userIdInput.value = user.id;
+      const userSurnameInput = document.createElement("input");
+      userSurnameInput.type = "text";
+      userSurnameInput.name = "surname";
+      userSurnameInput.id = "surname";
+      userSurnameInput.value = user.surname;
+
+      joinForm.prepend(userIdInput);
+      joinForm.prepend(userSurnameInput);
     },
     (error) => {
       console.log(error);
@@ -64,7 +69,7 @@ const getUserCircles = function (userId) {
 
     for (const circle of circles) {
       const option = document.createElement("option");
-      option.value = `${circle.unique_code}, ${circle.name}`;
+      option.value = `${circle.unique_code}`;
       option.textContent = circle.name;
       roomsChoice.append(option);
     }

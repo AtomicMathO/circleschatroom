@@ -1,7 +1,10 @@
+require('dotenv').config();
 const path = require("path");
 const http = require("http");
 const express = require("express");
 const socketio = require("socket.io");
+
+const controllerChat = require("./app/controller/controllerChat")
 const formatMessage = require("./utils/messages");
 const {
   userJoin,
@@ -9,21 +12,41 @@ const {
   userLeave,
   getRoomUsers,
 } = require("./utils/users");
+const { Console } = require("console");
+
+const router = require('./app/router');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
+//ejs
+app.set('view engine', 'ejs');
+app.set('views', './public/views');
+
+
+
 // Set static folder
 app.use(express.static(path.join(__dirname, "public")));
 
+
+app.use(router)
+
+
+
+const trackUser = new Array();
 const botName = "Aleks";
 
 // Run when client connects
 io.on("connection", (socket) => {
   console.log(socket.id);
   socket.on("joinRoom", ({ surname, room }) => {
-    console.log(room);
+    
+    
+    io.on('connection', function (socket) {
+        console.log(socket.id); //writes 1 on the console
+    })
+
     const user = userJoin(socket.id, surname, room);
 
     socket.join(user.room);
@@ -52,13 +75,25 @@ io.on("connection", (socket) => {
   // Listen for chatMessage
   socket.on("chatMessage", (msg) => {
     const user = getCurrentUser(socket.id);
-
+    
+    
+    controllerChat.addAMessage();
     io.in(user.room).emit("message", formatMessage(user.surname, msg));
+    // console.log(msg)
   });
 
   // Runs when client disconnects
   socket.on("disconnect", () => {
     const user = userLeave(socket.id);
+
+    // index = trackUser.indexOf(socket.id);
+
+    // if (index !== -1) {
+    //   trackUser.splice(index, 1)
+    // }
+
+    // console.log(trackUser);
+
 
     if (user) {
       io.to(user.room).emit(

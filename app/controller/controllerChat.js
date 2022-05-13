@@ -1,26 +1,35 @@
 const chatDatamapper = require("../datamapper/chatDatamapper");
+const {
+  userJoin,
+  getCurrentUser,
+  userLeave,
+  getRoomUsers,
+  getdbIdBysocketId,
+} = require("../../utils/users");
+const res = require("express/lib/response");
 
 const controllerChat = {
+  homepage(req, res) {
+    res.render("view");
+  },
 
-    homepage (req,res){
-        res.render('view')
-    },
+  chatPage(req, res) {
+    const { surname, user_id, room } = req.query;
+    res.render("chat", { room });
+  },
 
-    chatPage (req,res){
-        res.render('chat')
-    },
+  async sendMessageToDB(msg, socketId, room) {
+    const userId = getdbIdBysocketId(socketId);
+    // console.log("msg:" + msg);
+    // console.log("userId:" + userId);
+    // console.log("room:" + room);
 
-    async addAMessage (req, res){
-        console.log(req.body)
-        // const content = req.body.content;
-        // const circleCode = req.body.circleCode;
-        // const userId = req.body.userId ;
-    
-        // console.log(messageCircle);
-        // const addMessageCircle = await chatDatamapper.addMessageInCircle(content, circleCode, userId)
-        // res.render ('chat');
-    }
-}
+    const sendMessage = await chatDatamapper.addMessageInCircle(
+      msg,
+      userId,
+      room
+    );
+  },
+};
 
-
-module.exports = controllerChat
+module.exports = controllerChat;

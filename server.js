@@ -1,38 +1,34 @@
-require('dotenv').config();
+require("dotenv").config();
 const path = require("path");
 const http = require("http");
 const express = require("express");
 const socketio = require("socket.io");
 
-const controllerChat = require("./app/controller/controllerChat")
+const controllerChat = require("./app/controller/controllerChat");
 const formatMessage = require("./utils/messages");
 const {
   userJoin,
   getCurrentUser,
   userLeave,
   getRoomUsers,
+  getdbIdBysocketId,
 } = require("./utils/users");
-const { Console } = require("console");
 
-const router = require('./app/router');
+const router = require("./app/router");
 
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
 //ejs
-app.set('view engine', 'ejs');
-app.set('views', './public/views');
-
-
+app.set("view engine", "ejs");
+app.set("views", "./public/views");
 
 // Set static folder
 app.use(express.static(path.join(__dirname, "public")));
+app.use(express.json());
 
-
-app.use(router)
-
-
+app.use(router);
 
 const trackUser = new Array();
 const botName = "Aleks";
@@ -40,14 +36,10 @@ const botName = "Aleks";
 // Run when client connects
 io.on("connection", (socket) => {
   console.log(socket.id);
-  socket.on("joinRoom", ({ surname, room }) => {
-    
-    
-    io.on('connection', function (socket) {
-        console.log(socket.id); //writes 1 on the console
-    })
+  socket.on("joinRoom", ({ surname, user_id, room }) => {
+    io.on("connection", function (socket) {});
 
-    const user = userJoin(socket.id, surname, room);
+    const user = userJoin(socket.id, user_id, surname, room);
 
     socket.join(user.room);
 
@@ -75,25 +67,16 @@ io.on("connection", (socket) => {
   // Listen for chatMessage
   socket.on("chatMessage", (msg) => {
     const user = getCurrentUser(socket.id);
-    
-    
-    controllerChat.addAMessage();
+
+    controllerChat.sendMessageToDB(msg, socket.id, user.room);
+
     io.in(user.room).emit("message", formatMessage(user.surname, msg));
-    // console.log(msg)
+    console.log(msg);
   });
 
   // Runs when client disconnects
   socket.on("disconnect", () => {
     const user = userLeave(socket.id);
-
-    // index = trackUser.indexOf(socket.id);
-
-    // if (index !== -1) {
-    //   trackUser.splice(index, 1)
-    // }
-
-    // console.log(trackUser);
-
 
     if (user) {
       io.to(user.room).emit(
@@ -110,7 +93,7 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5555;
 
 server.listen(PORT, () =>
   console.log(`Server running on port http://localhost:${PORT}`)
